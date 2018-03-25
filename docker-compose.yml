@@ -19,10 +19,11 @@ services:
 
   db:
    image: mariadb:latest
+   restart: always
    volumes:
     - ./src/mariadb:/var/lib/mysql
    environment:
-    MYSQL_RANDOM_ROOT_PASSWORD: 1
+    MYSQL_ROOT_PASSWORD: passAdmin
     MYSQL_DATABASE: dev
     MYSQL_USER: dev
     MYSQL_PASSWORD: dev123
@@ -42,7 +43,7 @@ services:
    volumes:
    - ./src/sessions:/sessions 
    
-  admin:
+  adminer:
    image: adminer
    restart: always
    depends_on: 

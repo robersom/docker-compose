@@ -4,7 +4,7 @@ I put both, `phpMyAdmin` and `Adminer`, because many people don't know Adminer t
 * phpMyAdmin port: 8001 (you can change)
 * Adminer port: 8080 (you can change)
 * `pma:` session to phpMyAdmin (in `docker-compose.yml`)
-* `admin:` session to Adminer (in `docker-compose.yml`)
+* `adminer:` session to Adminer (in `docker-compose.yml`)
 
 ----
 SETUP
