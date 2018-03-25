@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  web:
+   image: nginx:latest
+   ports:
+   - "80:80"
+   - "443:443"
+   volumes:
+   - /var/www:/public
+   - ./src/site.conf:/etc/nginx/nginx.conf
+   - ./src/nginx/logs:/var/log/nginx/
+
+  php:
+   build:
+    context: ./src/php7
+   volumes:
+   - /var/www:/public
+
+  db:
+   image: mariadb:latest
+   volumes:
+    - ./src/mariadb:/var/lib/mysql
+   environment:
+    MYSQL_RANDOM_ROOT_PASSWORD: 1
+    MYSQL_DATABASE: dev
+    MYSQL_USER: dev
+    MYSQL_PASSWORD: dev123
+   ports:
+   - "3306:3306"   
+
+  pma:
+   image: phpmyadmin/phpmyadmin:latest
+   environment:
+    PMA_ARBITRARY: 1
+    PMA_HOST: db
+    PHP_UPLOAD_MAX_FILESIZE: 1G
+    PHP_MAX_INPUT_VARS: 1G
+   restart: always
+   ports:
+   - "8001:80"
+   volumes:
+   - ./src/sessions:/sessions 
+   
+  admin:
+   image: adminer
+   restart: always
+   depends_on: 
+     - db
+   ports:
+     - 8080:8080
