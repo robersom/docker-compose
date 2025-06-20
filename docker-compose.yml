@@ -1,52 +1,45 @@
-version: "3"
+version: '3.8'
 
 services:
-  web:
-   image: nginx:latest
-   ports:
-   - "80:80"
-   - "443:443"
-   volumes:
-   - /var/www:/public
-   - ./src/site.conf:/etc/nginx/nginx.conf
-   - ./src/nginx/logs:/var/log/nginx/
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./sites:/var/www
+      - ./nginx/site1.conf:/etc/nginx/conf.d/site1.conf
+      - ./nginx/site2.conf:/etc/nginx/conf.d/site2.conf
+      - ./nginx/roberson.conf:/etc/nginx/conf.d/roberson.conf
+      - ./nginx/voleonline.conf:/etc/nginx/conf.d/voleonline.conf
+    depends_on:
+      - php
 
   php:
-   build:
-    context: ./src/php7
-   volumes:
-   - /var/www:/public
+    build: ./php
+    volumes:
+      - ./sites:/var/www
+    env_file:
+      - .env
 
   db:
-   image: mariadb:latest
-   restart: always
-   volumes:
-    - ./src/mariadb:/var/lib/mysql
-   environment:
-    MYSQL_ROOT_PASSWORD: passAdmin
-    MYSQL_DATABASE: dev
-    MYSQL_USER: dev
-    MYSQL_PASSWORD: dev123
-   ports:
-   - "3306:3306"   
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  pma:
-   image: phpmyadmin/phpmyadmin:latest
-   environment:
-    PMA_ARBITRARY: 1
-    PMA_HOST: db
-    PHP_UPLOAD_MAX_FILESIZE: 1G
-    PHP_MAX_INPUT_VARS: 1G
-   restart: always
-   ports:
-   - "8001:80"
-   volumes:
-   - ./src/sessions:/sessions 
-   
   adminer:
-   image: adminer
-   restart: always
-   depends_on: 
-     - db
-   ports:
-     - 8080:8080
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    volumes:
+      - ./adminer/adminer.css:/var/www/html/adminer.css
+
+volumes:
+  pgdata:
